@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Banner AI Generator — Nhiếp ảnh & Quay phim</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800;900&family=Barlow+Condensed:wght@600;700;800&display=swap');
+
+:root {
+  --orange: #FF6B00;
+  --orange-dim: rgba(255,107,0,0.12);
+  --bg: #0f0f0f;
+  --bg2: #181818;
+  --bg3: #222;
+  --border: #2e2e2e;
+  --border2: #3a3a3a;
+  --text: #e8e8e8;
+  --muted: #777;
+  --green: #4ade80;
+  --radius: 8px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Barlow', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* ── NAV ── */
+header {
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.logo {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: #fff;
+}
+.logo em { color: var(--orange); font-style: normal; }
+.header-right { display: flex; align-items: center; gap: 12px; }
+.badge { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.12em; background: var(--orange); color: #fff; padding: 3px 8px; border-radius: 3px; }
+.webhook-input-wrap { display: flex; align-items: center; gap: 6px; }
+.webhook-input-wrap label { font-size: 0.72rem; color: var(--muted); white-space: nowrap; }
+#webhookUrl {
+  width: 220px;
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  border-radius: 5px;
+  padding: 5px 8px;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.72rem;
+  outline: none;
+}
+#webhookUrl:focus { border-color: var(--orange); }
+
+/* ── LAYOUT ── */
+.layout {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  min-height: calc(100vh - 52px);
+}
+
+/* ── FORM PANEL ── */
+.form-panel {
+  padding: 24px;
+  overflow-y: auto;
+  border-right: 1px solid var(--border);
+}
+.form-panel h1 {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: #fff;
+  margin-bottom: 2px;
+}
+.form-panel .desc { font-size: 0.78rem; color: var(--muted); margin-bottom: 20px; }
+
+.section { margin-bottom: 22px; }
+.sec-title {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--orange);
+  margin-bottom: 12px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+}
+.field { margin-bottom: 12px; }
+.field label {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 5px;
+}
+input[type=text], textarea {
+  width: 100%;
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius);
+  padding: 8px 11px;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.85rem;
+  outline: none;
+  transition: border-color 0.15s;
+}
+input[type=text]:focus, textarea:focus { border-color: var(--orange); }
+textarea { resize: vertical; min-height: 60px; }
+
+/* Upload */
+.upload-zone {
+  border: 2px dashed var(--border2);
+  border-radius: var(--radius);
+  padding: 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: var(--bg2);
+  position: relative;
+}
+.upload-zone.drag, .upload-zone:hover { border-color: var(--orange); background: var(--orange-dim); }
+.upload-zone input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+.upload-zone .ico { font-size: 1.8rem; }
+.upload-zone p { font-size: 0.78rem; color: var(--muted); margin-top: 4px; }
+.upload-zone p strong { color: var(--orange); }
+.img-preview { display: none; align-items: center; gap: 10px; margin-top: 10px; }
+.img-preview img { height: 56px; width: 56px; object-fit: cover; border-radius: 5px; border: 1px solid var(--border2); }
+.img-preview .img-info { text-align: left; }
+.img-preview .img-name { font-size: 0.78rem; color: var(--green); }
+.img-preview .img-size { font-size: 0.7rem; color: var(--muted); }
+.btn-remove-img { background: none; border: 1px solid var(--border2); border-radius: 4px; color: var(--muted); font-size: 0.72rem; padding: 3px 8px; cursor: pointer; margin-left: auto; }
+.btn-remove-img:hover { border-color: #e55; color: #e55; }
+
+/* Chips */
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.chip {
+  padding: 4px 12px;
+  border-radius: 4px;
+  border: 1px solid var(--border2);
+  background: var(--bg3);
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-family: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.12s;
+  user-select: none;
+}
+.chip:hover { border-color: var(--orange); color: var(--text); }
+.chip.on { border-color: var(--orange); background: var(--orange-dim); color: var(--orange); font-weight: 600; }
+
+/* Add custom */
+.add-row { display: flex; gap: 6px; margin-top: 8px; }
+.add-row input { flex: 1; font-size: 0.78rem; padding: 6px 10px; }
+.btn-add {
+  padding: 0 14px;
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius);
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 1.1rem;
+  line-height: 1;
+  transition: all 0.12s;
+}
+.btn-add:hover { border-color: var(--orange); color: var(--orange); }
+
+/* Tags */
+.tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 7px; }
+.tag {
+  display: flex; align-items: center; gap: 5px;
+  background: var(--bg3); border: 1px solid var(--border2);
+  border-radius: 4px; padding: 3px 9px;
+  font-size: 0.75rem; color: var(--text);
+}
+.tag button { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 0.9rem; padding: 0; line-height: 1; }
+.tag button:hover { color: #e55; }
+
+/* Color */
+.colors { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 4px; }
+.swatch { width: 26px; height: 26px; border-radius: 4px; cursor: pointer; border: 2px solid transparent; transition: transform 0.1s, border-color 0.1s; flex-shrink: 0; }
+.swatch:hover { transform: scale(1.12); }
+.swatch.on { border-color: #fff; box-shadow: 0 0 0 1px var(--border2); }
+input[type=color] { width: 26px; height: 26px; padding: 1px; border-radius: 4px; border: 1px solid var(--border2); background: var(--bg3); cursor: pointer; }
+.color-hex { font-size: 0.72rem; color: var(--muted); font-family: monospace; }
+
+/* Grid */
+.g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+/* ── JSON PANEL ── */
+.json-panel {
+  background: var(--bg2);
+  display: flex;
+  flex-direction: column;
+  position: sticky;
+  top: 52px;
+  height: calc(100vh - 52px);
+}
+.json-panel-head {
+  padding: 14px 16px 10px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+.json-panel-head h3 {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+}
+.json-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); animation: blink 2s infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+.json-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px 16px;
+}
+.json-out {
+  font-family: 'Courier New', monospace;
+  font-size: 0.72rem;
+  color: #7ec87e;
+  white-space: pre-wrap;
+  word-break: break-all;
+  line-height: 1.65;
+}
+.json-key { color: #79b8ff; }
+.json-str { color: #9ecbff; }
+.json-num { color: #f8c555; }
+.json-bool { color: #f97583; }
+
+.json-panel-foot {
+  padding: 14px 16px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.btn {
+  width: 100%;
+  padding: 11px;
+  border-radius: var(--radius);
+  border: none;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+  letter-spacing: 0.03em;
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+}
+.btn-copy { background: var(--bg3); border: 1px solid var(--border2); color: var(--text); }
+.btn-copy:hover { border-color: var(--green); color: var(--green); }
+.btn-send { background: var(--orange); color: #fff; }
+.btn-send:hover { background: #e06000; }
+.btn-send:disabled { background: #333; color: #555; cursor: not-allowed; }
+.btn-send.loading { background: #a84400; cursor: not-allowed; }
+
+.status-msg {
+  font-size: 0.72rem;
+  text-align: center;
+  padding: 6px;
+  border-radius: 5px;
+  display: none;
+}
+.status-msg.ok { display: block; background: rgba(74,222,128,0.1); color: var(--green); border: 1px solid rgba(74,222,128,0.3); }
+.status-msg.err { display: block; background: rgba(239,68,68,0.1); color: #f87171; border: 1px solid rgba(239,68,68,0.3); }
+.status-msg.info { display: block; background: rgba(255,107,0,0.1); color: var(--orange); border: 1px solid rgba(255,107,0,0.3); }
+
+/* ── TOAST ── */
+.toast {
+  position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+  background: #333; color: #fff; padding: 9px 18px;
+  border-radius: 6px; font-size: 0.8rem; z-index: 999;
+  opacity: 0; transition: opacity 0.25s; pointer-events: none;
+  white-space: nowrap;
+}
+.toast.show { opacity: 1; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  .layout { grid-template-columns: 1fr; }
+  .json-panel { position: static; height: auto; max-height: 420px; }
+  .webhook-input-wrap { display: none; }
+  #webhookUrl { width: 160px; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">BANNER<em>AI</em></div>
+  <div class="header-right">
+    <div class="webhook-input-wrap">
+      <label>n8n Webhook URL</label>
+      <input type="text" id="webhookUrl" placeholder="https://your-n8n.com/webhook/xxx"/>
+    </div>
+    <div class="badge">BETA</div>
+  </div>
+</header>
+
+<div class="layout">
+
+  <!-- ══ FORM ══ -->
+  <div class="form-panel">
+    <h1>Banner Generator</h1>
+    <p class="desc">Điền thông tin → JSON tự động cập nhật → Gửi đến n8n để generate banner</p>
+
+    <!-- Upload -->
+    <div class="section">
+      <div class="sec-title">Ảnh sản phẩm</div>
+      <div class="upload-zone" id="uploadZone">
+        <input type="file" id="fileInput" accept="image/*" onchange="handleFile(this)"/>
+        <div id="uploadPlaceholder">
+          <div class="ico">📷</div>
+          <p><strong>Chọn ảnh</strong> hoặc kéo thả vào đây</p>
+          <p style="font-size:0.7rem;margin-top:2px">JPG · PNG · WEBP — tối đa 10MB</p>
+        </div>
+        <div class="img-preview" id="imgPreview">
+          <img id="previewImg" src="" alt=""/>
+          <div class="img-info">
+            <div class="img-name" id="imgName"></div>
+            <div class="img-size" id="imgSize"></div>
+          </div>
+          <button class="btn-remove-img" onclick="removeImg(event)">✕ Xóa</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1. Sản phẩm -->
+    <div class="section">
+      <div class="sec-title">1 · Thông tin sản phẩm</div>
+
+      <div class="field">
+        <label>Tên sản phẩm <span style="color:#e55">*</span></label>
+        <input type="text" id="productName" placeholder="VD: Sony Alpha A7 IV, DJI Mini 4 Pro..." oninput="build()"/>
+      </div>
+
+      <div class="field">
+        <label>Danh mục</label>
+        <div class="chips" id="catChips">
+          <button class="chip" onclick="pick('category',this,'Máy ảnh')">📷 Máy ảnh</button>
+          <button class="chip" onclick="pick('category',this,'Ống kính')">🔭 Ống kính</button>
+          <button class="chip" onclick="pick('category',this,'Máy quay phim')">🎥 Máy quay</button>
+          <button class="chip" onclick="pick('category',this,'Action Camera')">🏄 Action Cam</button>
+          <button class="chip" onclick="pick('category',this,'Flycam / Drone')">🚁 Flycam</button>
+          <button class="chip" onclick="pick('category',this,'Thiết bị studio')">💡 Studio</button>
+          <button class="chip" onclick="pick('category',this,'Phụ kiện máy ảnh')">🎒 Phụ kiện</button>
+          <button class="chip" onclick="pick('category',this,'Gimbal')">🎬 Gimbal</button>
+          <button class="chip" onclick="pick('category',this,'Đèn chụp ảnh')">🔦 Đèn</button>
+        </div>
+        <div class="add-row">
+          <input type="text" id="catCustom" placeholder="Danh mục khác..."/>
+          <button class="btn-add" onclick="pickCustom('category','catCustom','catChips')">+</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Thương hiệu</label>
+        <div class="chips" id="brandChips">
+          <button class="chip" onclick="pick('brand',this,'Sony')">Sony</button>
+          <button class="chip" onclick="pick('brand',this,'Canon')">Canon</button>
+          <button class="chip" onclick="pick('brand',this,'Nikon')">Nikon</button>
+          <button class="chip" onclick="pick('brand',this,'Fujifilm')">Fujifilm</button>
+          <button class="chip" onclick="pick('brand',this,'DJI')">DJI</button>
+          <button class="chip" onclick="pick('brand',this,'GoPro')">GoPro</button>
+          <button class="chip" onclick="pick('brand',this,'Sigma')">Sigma</button>
+          <button class="chip" onclick="pick('brand',this,'Tamron')">Tamron</button>
+          <button class="chip" onclick="pick('brand',this,'Godox')">Godox</button>
+          <button class="chip" onclick="pick('brand',this,'Zhiyun')">Zhiyun</button>
+          <button class="chip" onclick="pick('brand',this,'Rode')">Rode</button>
+        </div>
+        <div class="add-row">
+          <input type="text" id="brandCustom" placeholder="Hãng khác..."/>
+          <button class="btn-add" onclick="pickCustom('brand','brandCustom','brandChips')">+</button>
+        </div>
+      </div>
+
+      <div class="g2">
+        <div class="field">
+          <label>Giá bán</label>
+          <input type="text" id="price" placeholder="45.990.000 VNĐ" oninput="build()"/>
+        </div>
+        <div class="field">
+          <label>Giá KM / % giảm</label>
+          <input type="text" id="discount" placeholder="10% hoặc 41.390.000" oninput="build()"/>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Thông số / Điểm nổi bật</label>
+        <div class="chips">
+          <button class="chip" onclick="addPreset('features','featureTags','33MP Full-Frame')">33MP</button>
+          <button class="chip" onclick="addPreset('features','featureTags','4K 60fps')">4K 60fps</button>
+          <button class="chip" onclick="addPreset('features','featureTags','Chống rung 5 trục')">Chống rung</button>
+          <button class="chip" onclick="addPreset('features','featureTags','Eye AF')">Eye AF</button>
+          <button class="chip" onclick="addPreset('features','featureTags','Kháng bụi nước')">Kháng nước</button>
+          <button class="chip" onclick="addPreset('features','featureTags','Log Video')">Log Video</button>
+          <button class="chip" onclick="addPreset('features','featureTags','10-bit color')">10-bit</button>
+          <button class="chip" onclick="addPreset('features','featureTags','RAW Support')">RAW</button>
+          <button class="chip" onclick="addPreset('features','featureTags','Wifi / Bluetooth')">WiFi/BT</button>
+          <button class="chip" onclick="addPreset('features','featureTags','Pin 580 shot')">Pin tốt</button>
+        </div>
+        <div class="add-row">
+          <input type="text" id="featureInput" placeholder="Thông số khác VD: ISO 100-51200"/>
+          <button class="btn-add" onclick="addTagFromInput('features','featureInput','featureTags')">+</button>
+        </div>
+        <div class="tags" id="featureTags"></div>
+      </div>
+    </div>
+
+    <!-- 2. Chiến dịch -->
+    <div class="section">
+      <div class="sec-title">2 · Chiến dịch & Nội dung</div>
+
+      <div class="field">
+        <label>Loại chiến dịch</label>
+        <div class="chips" id="campChips">
+          <button class="chip" onclick="pick('campaign',this,'Banner trang chủ')">Trang chủ</button>
+          <button class="chip" onclick="pick('campaign',this,'Flash Sale')">Flash Sale</button>
+          <button class="chip" onclick="pick('campaign',this,'Ra mắt sản phẩm mới')">Ra mắt</button>
+          <button class="chip" onclick="pick('campaign',this,'Black Friday')">Black Friday</button>
+          <button class="chip" onclick="pick('campaign',this,'Tết Nguyên Đán')">Tết</button>
+          <button class="chip" onclick="pick('campaign',this,'Sale 6.6')">Sale 6.6</button>
+          <button class="chip" onclick="pick('campaign',this,'Sale 11.11')">Sale 11.11</button>
+          <button class="chip" onclick="pick('campaign',this,'Combo tiết kiệm')">Combo</button>
+          <button class="chip" onclick="pick('campaign',this,'Trả góp 0%')">Trả góp 0%</button>
+          <button class="chip" onclick="pick('campaign',this,'Bảo hành chính hãng')">Bảo hành</button>
+        </div>
+        <div class="add-row">
+          <input type="text" id="campCustom" placeholder="Chiến dịch khác..."/>
+          <button class="btn-add" onclick="pickCustom('campaign','campCustom','campChips')">+</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Tiêu đề chính (Headline)</label>
+        <input type="text" id="headline" placeholder="VD: FLASH SALE — Giảm đến 15%" oninput="build()"/>
+      </div>
+
+      <div class="field">
+        <label>Tiêu đề phụ (Subheadline)</label>
+        <input type="text" id="subHeadline" placeholder="VD: Tặng kèm túi máy trị giá 500.000đ" oninput="build()"/>
+      </div>
+
+      <div class="field">
+        <label>Nút CTA</label>
+        <div class="chips" id="ctaChips">
+          <button class="chip" onclick="pick('cta',this,'Mua ngay')">Mua ngay</button>
+          <button class="chip" onclick="pick('cta',this,'Xem chi tiết')">Xem chi tiết</button>
+          <button class="chip" onclick="pick('cta',this,'Đặt hàng ngay')">Đặt hàng</button>
+          <button class="chip" onclick="pick('cta',this,'Nhận tư vấn')">Nhận tư vấn</button>
+          <button class="chip" onclick="pick('cta',this,'Trả góp ngay')">Trả góp</button>
+          <button class="chip" onclick="pick('cta',this,'Khám phá ngay')">Khám phá</button>
+        </div>
+        <div class="add-row">
+          <input type="text" id="ctaCustom" placeholder="CTA khác..."/>
+          <button class="btn-add" onclick="pickCustom('cta','ctaCustom','ctaChips')">+</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. Đối tượng -->
+    <div class="section">
+      <div class="sec-title">3 · Đối tượng khách hàng</div>
+      <div class="chips" id="audChips">
+        <button class="chip" onclick="pick('audience',this,'Nhiếp ảnh gia chuyên nghiệp')">Photographer Pro</button>
+        <button class="chip" onclick="pick('audience',this,'Người chơi ảnh nghiệp dư')">Hobbyist</button>
+        <button class="chip" onclick="pick('audience',this,'Content Creator / Youtuber')">Content Creator</button>
+        <button class="chip" onclick="pick('audience',this,'Videographer chuyên nghiệp')">Videographer</button>
+        <button class="chip" onclick="pick('audience',this,'Drone pilot / Flycam')">Drone Pilot</button>
+        <button class="chip" onclick="pick('audience',this,'Nhiếp ảnh thể thao')">Outdoor/Sports</button>
+        <button class="chip" onclick="pick('audience',this,'Studio photographer')">Studio</button>
+        <button class="chip" onclick="pick('audience',this,'Sinh viên nhiếp ảnh')">Sinh viên</button>
+      </div>
+      <div class="add-row">
+        <input type="text" id="audCustom" placeholder="Đối tượng khác..."/>
+        <button class="btn-add" onclick="pickCustom('audience','audCustom','audChips')">+</button>
+      </div>
+    </div>
+
+    <!-- 4. Kích thước -->
+    <div class="section">
+      <div class="sec-title">4 · Kích thước banner</div>
+      <div class="chips" id="sizeChips">
+        <button class="chip" onclick="pick('size',this,'1920x600')">🖥 Web Banner (1920×600)</button>
+        <button class="chip" onclick="pick('size',this,'1200x628')">📘 Facebook (1200×628)</button>
+        <button class="chip" onclick="pick('size',this,'1080x1080')">📷 Instagram (1080×1080)</button>
+        <button class="chip" onclick="pick('size',this,'1080x1920')">📱 Story/Reels (1080×1920)</button>
+        <button class="chip" onclick="pick('size',this,'800x800')">🛒 Shopee/Lazada (800×800)</button>
+        <button class="chip" onclick="pick('size',this,'728x90')">📣 Leaderboard (728×90)</button>
+      </div>
+      <div class="add-row">
+        <input type="text" id="sizeCustom" placeholder="Kích thước tùy chỉnh VD: 1440x500"/>
+        <button class="btn-add" onclick="pickCustom('size','sizeCustom','sizeChips')">+</button>
+      </div>
+    </div>
+
+    <!-- 5. Thương hiệu -->
+    <div class="section">
+      <div class="sec-title">5 · Thương hiệu shop</div>
+
+      <div class="field">
+        <label>Màu chủ đạo</label>
+        <div class="colors">
+          <div class="swatch on" style="background:#FF6B00" onclick="pickColor(this,'#FF6B00')" title="#FF6B00"></div>
+          <div class="swatch" style="background:#1A1A2E" onclick="pickColor(this,'#1A1A2E')" title="#1A1A2E"></div>
+          <div class="swatch" style="background:#E31837" onclick="pickColor(this,'#E31837')" title="#E31837"></div>
+          <div class="swatch" style="background:#0066FF" onclick="pickColor(this,'#0066FF')" title="#0066FF"></div>
+          <div class="swatch" style="background:#FFD700" onclick="pickColor(this,'#FFD700')" title="#FFD700"></div>
+          <div class="swatch" style="background:#00B14F" onclick="pickColor(this,'#00B14F')" title="#00B14F"></div>
+          <div class="swatch" style="background:#111" onclick="pickColor(this,'#111111')" title="#111111" style="border:1px solid #444"></div>
+          <input type="color" id="colorPicker" value="#FF6B00" onchange="pickColor(null,this.value)"/>
+          <span class="color-hex" id="colorHex">#FF6B00</span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Font chữ</label>
+        <div class="chips" id="fontChips">
+          <button class="chip" onclick="pick('font',this,'Barlow Condensed')">Barlow</button>
+          <button class="chip" onclick="pick('font',this,'Montserrat')">Montserrat</button>
+          <button class="chip" onclick="pick('font',this,'Oswald')">Oswald</button>
+          <button class="chip" onclick="pick('font',this,'Roboto Condensed')">Roboto Condensed</button>
+          <button class="chip" onclick="pick('font',this,'Be Vietnam Pro')">Be Vietnam Pro</button>
+        </div>
+        <div class="add-row">
+          <input type="text" id="fontCustom" placeholder="Font khác (Google Font)..."/>
+          <button class="btn-add" onclick="pickCustom('font','fontCustom','fontChips')">+</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Slogan shop</label>
+        <input type="text" id="slogan" placeholder="VD: Chuyên nghiệp từng khoảnh khắc" oninput="build()"/>
+      </div>
+    </div>
+
+    <!-- 6. Thiết kế -->
+    <div class="section">
+      <div class="sec-title">6 · Phong cách & Nền ảnh</div>
+
+      <div class="field">
+        <label>Style thiết kế</label>
+        <div class="chips" id="styleChips">
+          <button class="chip" onclick="pick('style',this,'Tech Premium Dark')">Tech Dark</button>
+          <button class="chip" onclick="pick('style',this,'Clean Minimal White')">Minimal</button>
+          <button class="chip" onclick="pick('style',this,'Bold Orange Vibrant')">Bold Orange</button>
+          <button class="chip" onclick="pick('style',this,'Cinematic Dark')">Cinematic</button>
+          <button class="chip" onclick="pick('style',this,'Outdoor Adventure')">Outdoor</button>
+          <button class="chip" onclick="pick('style',this,'Professional Studio')">Studio</button>
+          <button class="chip" onclick="pick('style',this,'Luxury Premium')">Luxury</button>
+        </div>
+        <div class="add-row">
+          <input type="text" id="styleCustom" placeholder="Style khác..."/>
+          <button class="btn-add" onclick="pickCustom('style','styleCustom','styleChips')">+</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Nền sản phẩm — PhotoRoom background prompt</label>
+        <div class="chips" id="bgChips">
+          <button class="chip" onclick="pick('bgPrompt',this,'Pure white studio background, soft professional lighting')">Trắng studio</button>
+          <button class="chip" onclick="pick('bgPrompt',this,'Dark dramatic background, orange accent rim light, tech product photography')">Dark tech cam</button>
+          <button class="chip" onclick="pick('bgPrompt',this,'Outdoor mountain landscape, golden hour, adventure photography')">Ngoài trời</button>
+          <button class="chip" onclick="pick('bgPrompt',this,'Cinematic dark background, lens flare, shallow bokeh')">Cinematic</button>
+          <button class="chip" onclick="pick('bgPrompt',this,'Wooden desk with photography accessories, natural window light')">Lifestyle bàn</button>
+          <button class="chip" onclick="pick('bgPrompt',this,'Minimal grey gradient, professional product photo')">Grey studio</button>
+        </div>
+        <div class="add-row">
+          <input type="text" id="bgCustom" placeholder="Mô tả nền tự do (tiếng Anh cho PhotoRoom AI)..."/>
+          <button class="btn-add" onclick="pickCustom('bgPrompt','bgCustom','bgChips')">+</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Ghi chú thêm cho AI</label>
+        <textarea id="notes" placeholder="VD: Nhấn mạnh giá ưu đãi, thêm badge Hàng chính hãng, hiệu ứng ánh sáng từ trái, không dùng màu xanh lá..." oninput="build()"></textarea>
+      </div>
+    </div>
+
+  </div><!-- /form-panel -->
+
+  <!-- ══ JSON PANEL ══ -->
+  <div class="json-panel">
+    <div class="json-panel-head">
+      <h3>JSON Output</h3>
+      <div style="display:flex;align-items:center;gap:6px">
+        <div class="json-dot"></div>
+        <span style="font-size:0.68rem;color:var(--muted)">Live</span>
+      </div>
+    </div>
+    <div class="json-body">
+      <pre class="json-out" id="jsonOut">{}</pre>
+    </div>
+    <div class="json-panel-foot">
+      <div class="status-msg" id="statusMsg"></div>
+      <button class="btn btn-copy" onclick="copyJSON()">
+        <span>📋</span> Copy JSON
+      </button>
+      <button class="btn btn-send" id="sendBtn" onclick="sendToN8n()">
+        <span>⚡</span> Gửi đến n8n
+      </button>
+    </div>
+  </div>
+
+</div><!-- /layout -->
+
+<div class="toast" id="toast"></div>
+
+<script>
+const S = {
+  productName:'', category:'', brand:'', price:'', discount:'',
+  features:[], campaign:'', headline:'', subHeadline:'', cta:'',
+  audience:'', size:'', brandColor:'#FF6B00', font:'', slogan:'',
+  style:'', bgPrompt:'', notes:'',
+  hasImage: false, imageName: '', imageBase64: null
+};
+
+// ── File upload ──
+function handleFile(input) {
+  const file = input.files[0];
+  if (!file) return;
+  if (file.size > 10*1024*1024) { toast('⚠️ Ảnh quá 10MB!'); return; }
+  S.hasImage = true; S.imageName = file.name;
+  const reader = new FileReader();
+  reader.onload = e => {
+    S.imageBase64 = e.target.result;
+    document.getElementById('previewImg').src = e.target.result;
+    document.getElementById('imgName').textContent = '✓ ' + file.name;
+    document.getElementById('imgSize').textContent = (file.size/1024).toFixed(0) + ' KB · ' + file.type;
+    document.getElementById('uploadPlaceholder').style.display = 'none';
+    document.getElementById('imgPreview').style.display = 'flex';
+    build();
+  };
+  reader.readAsDataURL(file);
+}
+function removeImg(e) {
+  e.stopPropagation();
+  S.hasImage = false; S.imageName = ''; S.imageBase64 = null;
+  document.getElementById('fileInput').value = '';
+  document.getElementById('uploadPlaceholder').style.display = 'block';
+  document.getElementById('imgPreview').style.display = 'none';
+  build();
+}
+const uz = document.getElementById('uploadZone');
+uz.addEventListener('dragover', e => { e.preventDefault(); uz.classList.add('drag'); });
+uz.addEventListener('dragleave', () => uz.classList.remove('drag'));
+uz.addEventListener('drop', e => {
+  e.preventDefault(); uz.classList.remove('drag');
+  const f = e.dataTransfer.files[0];
+  if (f && f.type.startsWith('image/')) {
+    const dt = new DataTransfer(); dt.items.add(f);
+    const fi = document.getElementById('fileInput');
+    fi.files = dt.files; handleFile(fi);
+  }
+});
+
+// ── Chips ──
+function pick(key, el, val) {
+  el.closest('.chips').querySelectorAll('.chip').forEach(c => c.classList.remove('on'));
+  el.classList.add('on'); S[key] = val; build();
+}
+function pickCustom(key, inputId, chipsId) {
+  const inp = document.getElementById(inputId);
+  const val = inp.value.trim(); if (!val) return;
+  const grp = document.getElementById(chipsId);
+  grp.querySelectorAll('.chip').forEach(c => c.classList.remove('on'));
+  const btn = document.createElement('button');
+  btn.className = 'chip on'; btn.textContent = val;
+  const v = val;
+  btn.onclick = function() { pick(key, this, v); };
+  grp.appendChild(btn); S[key] = val; inp.value = ''; build();
+}
+function addPreset(key, listId, val) {
+  if (!S[key]) S[key] = [];
+  if (S[key].includes(val)) return;
+  S[key].push(val); renderTag(key, listId, val); build();
+}
+function addTagFromInput(key, inputId, listId) {
+  const inp = document.getElementById(inputId);
+  const val = inp.value.trim(); if (!val) return;
+  addPreset(key, listId, val); inp.value = '';
+}
+function renderTag(key, listId, val) {
+  const list = document.getElementById(listId);
+  const tag = document.createElement('div'); tag.className = 'tag';
+  const safeVal = val.replace(/'/g, "\\'");
+  tag.innerHTML = `<span>${val}</span><button onclick="removeTag('${key}','${listId}','${safeVal}',this.parentElement)">×</button>`;
+  list.appendChild(tag);
+}
+function removeTag(key, listId, val, el) {
+  if (S[key]) S[key] = S[key].filter(v => v !== val);
+  el.remove(); build();
+}
+function pickColor(el, val) {
+  document.querySelectorAll('.swatch').forEach(s => s.classList.remove('on'));
+  if (el) el.classList.add('on');
+  S.brandColor = val;
+  document.getElementById('colorHex').textContent = val;
+  if (val.length === 7) document.getElementById('colorPicker').value = val;
+  build();
+}
+
+// ── Build JSON ──
+function build() {
+  S.productName = document.getElementById('productName').value.trim();
+  S.price       = document.getElementById('price').value.trim();
+  S.discount    = document.getElementById('discount').value.trim();
+  S.headline    = document.getElementById('headline').value.trim();
+  S.subHeadline = document.getElementById('subHeadline').value.trim();
+  S.slogan      = document.getElementById('slogan').value.trim();
+  S.notes       = document.getElementById('notes').value.trim();
+
+  const out = {};
+  if (S.productName) out.productName = S.productName;
+  if (S.brand)       out.brand       = S.brand;
+  if (S.category)    out.category    = S.category;
+  if (S.price)       out.price       = S.price;
+  if (S.discount)    out.discount    = S.discount;
+  if (S.features && S.features.length) out.features = S.features;
+  if (S.campaign)    out.campaign    = S.campaign;
+  if (S.headline)    out.headline    = S.headline;
+  if (S.subHeadline) out.subHeadline = S.subHeadline;
+  if (S.cta)         out.cta         = S.cta;
+  if (S.audience)    out.targetAudience = S.audience;
+  if (S.size)        out.size        = S.size;
+  out.brandColor = S.brandColor;
+  if (S.font)        out.font        = S.font;
+  if (S.slogan)      out.slogan      = S.slogan;
+  if (S.style)       out.style       = S.style;
+  if (S.bgPrompt)    out.backgroundPrompt = S.bgPrompt;
+  if (S.notes)       out.notes       = S.notes;
+  if (S.hasImage)    out.image = { name: S.imageName, included: true };
+
+  renderJSON(out);
+  window._currentJSON = out;
+}
+
+function renderJSON(obj) {
+  const lines = JSON.stringify(obj, null, 2);
+  // Simple syntax highlight
+  const highlighted = lines
+    .replace(/("[\w]+")\s*:/g, '<span class="json-key">$1</span>:')
+    .replace(/:\s*(".*?")/g, ': <span class="json-str">$1</span>')
+    .replace(/:\s*(\d+\.?\d*)/g, ': <span class="json-num">$1</span>')
+    .replace(/:\s*(true|false|null)/g, ': <span class="json-bool">$1</span>');
+  document.getElementById('jsonOut').innerHTML = highlighted;
+}
+
+// ── Actions ──
+function copyJSON() {
+  const obj = {...(window._currentJSON || {})};
+  if (S.imageBase64) obj.imageBase64 = S.imageBase64;
+  navigator.clipboard.writeText(JSON.stringify(obj, null, 2));
+  toast('✅ Đã copy JSON!');
+}
+
+async function sendToN8n() {
+  const url = document.getElementById('webhookUrl').value.trim();
+  if (!url) {
+    setStatus('info', '⚠️ Nhập n8n Webhook URL ở thanh trên trước!');
+    return;
+  }
+  if (!S.productName) {
+    setStatus('err', '⚠️ Vui lòng nhập tên sản phẩm!');
+    return;
+  }
+
+  const btn = document.getElementById('sendBtn');
+  btn.disabled = true; btn.classList.add('loading');
+  btn.innerHTML = '<span>⏳</span> Đang gửi...';
+  setStatus('info', 'Đang kết nối đến n8n...');
+
+  const payload = {...(window._currentJSON || {})};
+  if (S.imageBase64) payload.imageBase64 = S.imageBase64;
+
+  try {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (res.ok) {
+      setStatus('ok', '✅ Gửi thành công! n8n đã nhận dữ liệu.');
+      toast('✅ Đã gửi đến n8n!');
+    } else {
+      setStatus('err', `❌ Lỗi ${res.status}: ${res.statusText}`);
+    }
+  } catch (err) {
+    setStatus('err', '❌ Không kết nối được. Kiểm tra URL hoặc CORS.');
+  } finally {
+    btn.disabled = false; btn.classList.remove('loading');
+    btn.innerHTML = '<span>⚡</span> Gửi đến n8n';
+  }
+}
+
+function setStatus(type, msg) {
+  const el = document.getElementById('statusMsg');
+  el.className = 'status-msg ' + type;
+  el.textContent = msg;
+}
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+build();
+</script>
+</body>
+</html>
