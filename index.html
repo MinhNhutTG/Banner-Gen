@@ -304,6 +304,27 @@ input[type=color] { width: 26px; height: 26px; padding: 1px; border-radius: 4px;
 }
 .toast.show { opacity: 1; }
 
+/* ── LAYOUT PICKER ── */
+.layout-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+.layout-card {
+  background: var(--bg3);
+  border: 2px solid var(--border2);
+  border-radius: var(--radius);
+  padding: 8px;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-align: center;
+}
+.layout-card:hover { border-color: var(--orange); background: var(--orange-dim); }
+.layout-card.on { border-color: var(--orange); background: var(--orange-dim); box-shadow: 0 0 0 1px var(--orange); }
+.layout-card svg { width: 100%; height: auto; border-radius: 3px; display: block; margin-bottom: 6px; }
+.layout-name { font-size: 0.75rem; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+.layout-desc { font-size: 0.68rem; color: var(--muted); }
+
 /* ── RESPONSIVE ── */
 @media (max-width: 768px) {
   .layout { grid-template-columns: 1fr; }
@@ -606,6 +627,142 @@ input[type=color] { width: 26px; height: 26px; padding: 1px; border-radius: 4px;
       </div>
     </div>
 
+    <!-- 7. Bố cục banner -->
+    <div class="section">
+      <div class="sec-title">7 · Bố cục banner (Layout)</div>
+      <p style="font-size:0.75rem;color:var(--muted);margin-bottom:12px">Chọn cách sắp xếp sản phẩm, tiêu đề và giá trên banner</p>
+      <div class="layout-grid" id="layoutGrid">
+
+        <!-- Layout 1: Sản phẩm trái, text phải -->
+        <div class="layout-card" onclick="pickLayout(this,'product-left')" title="Sản phẩm trái, nội dung phải">
+          <svg viewBox="0 0 160 90" xmlns="http://www.w3.org/2000/svg">
+            <rect width="160" height="90" fill="#1a1a1a" rx="4"/>
+            <!-- product left -->
+            <rect x="8" y="10" width="58" height="70" rx="3" fill="#2a2a2a"/>
+            <rect x="18" y="20" width="38" height="38" rx="2" fill="#FF6B00" opacity="0.3"/>
+            <ellipse cx="37" cy="39" rx="14" ry="12" fill="#FF6B00" opacity="0.5"/>
+            <!-- text right -->
+            <rect x="76" y="14" width="76" height="7" rx="2" fill="#FF6B00" opacity="0.8"/>
+            <rect x="76" y="26" width="60" height="5" rx="2" fill="#555"/>
+            <rect x="76" y="35" width="50" height="5" rx="2" fill="#555"/>
+            <rect x="76" y="48" width="40" height="8" rx="2" fill="#FF6B00" opacity="0.4"/>
+            <rect x="76" y="60" width="55" height="10" rx="3" fill="#FF6B00" opacity="0.9"/>
+            <!-- price badge -->
+            <rect x="76" y="74" width="35" height="8" rx="2" fill="#333"/>
+            <rect x="115" y="74" width="28" height="8" rx="2" fill="#444"/>
+          </svg>
+          <div class="layout-name">Sản phẩm trái</div>
+          <div class="layout-desc">Text & CTA bên phải</div>
+        </div>
+
+        <!-- Layout 2: Sản phẩm phải, text trái -->
+        <div class="layout-card" onclick="pickLayout(this,'product-right')" title="Sản phẩm phải, nội dung trái">
+          <svg viewBox="0 0 160 90" xmlns="http://www.w3.org/2000/svg">
+            <rect width="160" height="90" fill="#1a1a1a" rx="4"/>
+            <!-- text left -->
+            <rect x="8" y="14" width="76" height="7" rx="2" fill="#FF6B00" opacity="0.8"/>
+            <rect x="8" y="26" width="60" height="5" rx="2" fill="#555"/>
+            <rect x="8" y="35" width="50" height="5" rx="2" fill="#555"/>
+            <rect x="8" y="48" width="40" height="8" rx="2" fill="#FF6B00" opacity="0.4"/>
+            <rect x="8" y="60" width="55" height="10" rx="3" fill="#FF6B00" opacity="0.9"/>
+            <rect x="8" y="74" width="35" height="8" rx="2" fill="#333"/>
+            <rect x="47" y="74" width="28" height="8" rx="2" fill="#444"/>
+            <!-- product right -->
+            <rect x="94" y="10" width="58" height="70" rx="3" fill="#2a2a2a"/>
+            <rect x="104" y="20" width="38" height="38" rx="2" fill="#FF6B00" opacity="0.3"/>
+            <ellipse cx="123" cy="39" rx="14" ry="12" fill="#FF6B00" opacity="0.5"/>
+          </svg>
+          <div class="layout-name">Sản phẩm phải</div>
+          <div class="layout-desc">Text & CTA bên trái</div>
+        </div>
+
+        <!-- Layout 3: Sản phẩm giữa, text 2 bên -->
+        <div class="layout-card" onclick="pickLayout(this,'product-center')" title="Sản phẩm giữa, text 2 bên">
+          <svg viewBox="0 0 160 90" xmlns="http://www.w3.org/2000/svg">
+            <rect width="160" height="90" fill="#1a1a1a" rx="4"/>
+            <!-- text left -->
+            <rect x="6" y="20" width="42" height="6" rx="2" fill="#FF6B00" opacity="0.8"/>
+            <rect x="6" y="30" width="36" height="4" rx="2" fill="#555"/>
+            <rect x="6" y="38" width="30" height="4" rx="2" fill="#555"/>
+            <rect x="6" y="56" width="38" height="8" rx="3" fill="#FF6B00" opacity="0.9"/>
+            <!-- product center -->
+            <rect x="54" y="8" width="52" height="74" rx="3" fill="#2a2a2a"/>
+            <rect x="60" y="15" width="40" height="45" rx="2" fill="#FF6B00" opacity="0.25"/>
+            <ellipse cx="80" cy="37" rx="16" ry="14" fill="#FF6B00" opacity="0.5"/>
+            <!-- price center bottom -->
+            <rect x="58" y="66" width="44" height="10" rx="2" fill="#FF6B00" opacity="0.4"/>
+            <!-- text right -->
+            <rect x="112" y="20" width="42" height="6" rx="2" fill="#FF6B00" opacity="0.8"/>
+            <rect x="112" y="30" width="36" height="4" rx="2" fill="#555"/>
+            <rect x="112" y="38" width="30" height="4" rx="2" fill="#555"/>
+            <rect x="112" y="56" width="38" height="8" rx="3" fill="#444"/>
+          </svg>
+          <div class="layout-name">Sản phẩm giữa</div>
+          <div class="layout-desc">Text chia 2 bên</div>
+        </div>
+
+        <!-- Layout 4: Text trên, sản phẩm dưới (portrait/story) -->
+        <div class="layout-card" onclick="pickLayout(this,'text-top')" title="Tiêu đề trên, sản phẩm dưới">
+          <svg viewBox="0 0 160 90" xmlns="http://www.w3.org/2000/svg">
+            <rect width="160" height="90" fill="#1a1a1a" rx="4"/>
+            <!-- text top -->
+            <rect x="20" y="8" width="120" height="9" rx="2" fill="#FF6B00" opacity="0.8"/>
+            <rect x="35" y="21" width="90" height="6" rx="2" fill="#555"/>
+            <rect x="50" y="31" width="60" height="6" rx="2" fill="#FF6B00" opacity="0.4"/>
+            <!-- product bottom center -->
+            <rect x="40" y="44" width="80" height="38" rx="3" fill="#2a2a2a"/>
+            <ellipse cx="80" cy="63" rx="22" ry="16" fill="#FF6B00" opacity="0.45"/>
+            <!-- CTA overlay -->
+            <rect x="52" y="76" width="56" height="9" rx="3" fill="#FF6B00" opacity="0.9"/>
+          </svg>
+          <div class="layout-name">Tiêu đề trên</div>
+          <div class="layout-desc">Sản phẩm phía dưới</div>
+        </div>
+
+        <!-- Layout 5: Full background, text overlay bottom -->
+        <div class="layout-card" onclick="pickLayout(this,'fullbg-text-bottom')" title="Ảnh full, text phủ dưới">
+          <svg viewBox="0 0 160 90" xmlns="http://www.w3.org/2000/svg">
+            <rect width="160" height="90" fill="#1a1a1a" rx="4"/>
+            <!-- full product bg -->
+            <rect x="0" y="0" width="160" height="90" rx="4" fill="#2a2a2a"/>
+            <ellipse cx="80" cy="38" rx="40" ry="32" fill="#FF6B00" opacity="0.3"/>
+            <!-- gradient overlay bottom -->
+            <rect x="0" y="55" width="160" height="35" rx="0" fill="#000" opacity="0.7"/>
+            <!-- text bottom -->
+            <rect x="10" y="60" width="90" height="7" rx="2" fill="#FF6B00" opacity="0.9"/>
+            <rect x="10" y="71" width="70" height="5" rx="2" fill="#aaa" opacity="0.7"/>
+            <!-- CTA right -->
+            <rect x="112" y="62" width="40" height="14" rx="3" fill="#FF6B00"/>
+          </svg>
+          <div class="layout-name">Full background</div>
+          <div class="layout-desc">Text phủ phía dưới</div>
+        </div>
+
+        <!-- Layout 6: Split diagonal -->
+        <div class="layout-card" onclick="pickLayout(this,'diagonal-split')" title="Chia đôi chéo">
+          <svg viewBox="0 0 160 90" xmlns="http://www.w3.org/2000/svg">
+            <rect width="160" height="90" fill="#1a1a1a" rx="4"/>
+            <!-- left panel -->
+            <clipPath id="cl"><rect width="160" height="90" rx="4"/></clipPath>
+            <polygon points="0,0 95,0 70,90 0,90" fill="#FF6B00" opacity="0.15" clip-path="url(#cl)"/>
+            <!-- diagonal line -->
+            <line x1="95" y1="0" x2="70" y2="90" stroke="#FF6B00" stroke-width="1.5" opacity="0.6"/>
+            <!-- product left -->
+            <ellipse cx="42" cy="45" rx="28" ry="24" fill="#FF6B00" opacity="0.4"/>
+            <!-- text right -->
+            <rect x="88" y="18" width="62" height="8" rx="2" fill="#FF6B00" opacity="0.9"/>
+            <rect x="88" y="30" width="50" height="5" rx="2" fill="#555"/>
+            <rect x="88" y="40" width="44" height="5" rx="2" fill="#555"/>
+            <rect x="88" y="54" width="36" height="7" rx="2" fill="#FF6B00" opacity="0.4"/>
+            <rect x="88" y="66" width="52" height="10" rx="3" fill="#FF6B00" opacity="0.9"/>
+          </svg>
+          <div class="layout-name">Chéo Diagonal</div>
+          <div class="layout-desc">Tách nền 2 vùng chéo</div>
+        </div>
+
+      </div>
+    </div>
+
   </div><!-- /form-panel -->
 
   <!-- ══ JSON PANEL ══ -->
@@ -640,9 +797,17 @@ const S = {
   productName:'', category:'', brand:'', price:'', discount:'',
   features:[], campaign:'', headline:'', subHeadline:'', cta:'',
   audience:'', size:'', brandColor:'#FF6B00', font:'', slogan:'',
-  style:'', bgPrompt:'', notes:'',
+  style:'', bgPrompt:'', notes:'', layout:'',
   hasImage: false, imageName: '', imageBase64: null
 };
+
+// ── Layout picker ──
+function pickLayout(el, val) {
+  document.querySelectorAll('.layout-card').forEach(c => c.classList.remove('on'));
+  el.classList.add('on');
+  S.layout = val;
+  build();
+}
 
 // ── File upload ──
 function handleFile(input) {
@@ -757,7 +922,8 @@ function build() {
   if (S.slogan)      out.slogan      = S.slogan;
   if (S.style)       out.style       = S.style;
   if (S.bgPrompt)    out.backgroundPrompt = S.bgPrompt;
-  if (S.notes)       out.notes       = S.notes;
+  if (S.layout)      out.layout       = S.layout;
+  if (S.notes)       out.notes        = S.notes;
   if (S.hasImage)    out.image = { name: S.imageName, included: true };
 
   renderJSON(out);
