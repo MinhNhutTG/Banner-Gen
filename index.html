@@ -71,10 +71,10 @@ header {
 #webhookUrl:focus { border-color: var(--orange); }
 
 /* ── LAYOUT ── */
-.layout {
+.tab-content.active {
   display: grid;
   grid-template-columns: 1fr 380px;
-  min-height: calc(100vh - 52px);
+  min-height: calc(100vh - 90px);
 }
 
 /* ── FORM PANEL ── */
@@ -325,6 +325,113 @@ input[type=color] { width: 26px; height: 26px; padding: 1px; border-radius: 4px;
 .layout-name { font-size: 0.75rem; font-weight: 700; color: var(--text); margin-bottom: 2px; }
 .layout-desc { font-size: 0.68rem; color: var(--muted); }
 
+/* ── TABS ── */
+.tab-bar {
+  display: flex;
+  gap: 2px;
+  padding: 0 24px;
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+}
+.tab-btn {
+  padding: 10px 18px;
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--muted);
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+.tab-btn:hover { color: var(--text); }
+.tab-btn.active { color: var(--orange); border-bottom-color: var(--orange); }
+
+.tab-content { display: none; }
+.tab-content.active { display: grid; grid-template-columns: 1fr 380px; min-height: calc(100vh - 90px); }
+
+/* ── PRODUCT IMAGE TAB ── */
+.mode-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 4px;
+}
+.mode-card {
+  background: var(--bg3);
+  border: 2px solid var(--border2);
+  border-radius: var(--radius);
+  padding: 12px 8px;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-align: center;
+}
+.mode-card:hover { border-color: var(--orange); }
+.mode-card.on { border-color: var(--orange); background: var(--orange-dim); }
+.mode-card .mode-ico { font-size: 1.6rem; margin-bottom: 4px; }
+.mode-card .mode-name { font-size: 0.78rem; font-weight: 700; color: var(--text); }
+.mode-card .mode-desc { font-size: 0.68rem; color: var(--muted); margin-top: 2px; }
+
+.format-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
+
+.quality-slider { width: 100%; margin-top: 6px; accent-color: var(--orange); }
+
+.batch-zone {
+  border: 2px dashed var(--border2);
+  border-radius: var(--radius);
+  padding: 16px;
+  text-align: center;
+  background: var(--bg2);
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+}
+.batch-zone:hover, .batch-zone.drag { border-color: var(--orange); background: var(--orange-dim); }
+.batch-zone input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+.batch-list { margin-top: 10px; display: flex; flex-direction: column; gap: 5px; max-height: 160px; overflow-y: auto; }
+.batch-item { display: flex; align-items: center; gap: 8px; background: var(--bg3); border: 1px solid var(--border2); border-radius: 5px; padding: 5px 10px; font-size: 0.75rem; }
+.batch-item .bi-thumb { width: 32px; height: 32px; object-fit: cover; border-radius: 3px; flex-shrink: 0; }
+.batch-item .bi-name { flex: 1; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.batch-item .bi-size { color: var(--muted); flex-shrink: 0; }
+.batch-item .bi-remove { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 1rem; padding: 0; flex-shrink: 0; }
+.batch-item .bi-remove:hover { color: #e55; }
+.batch-count { font-size: 0.72rem; color: var(--orange); font-weight: 600; margin-top: 6px; }
+
+.badge-grid { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.badge-chip {
+  padding: 4px 12px;
+  border-radius: 4px;
+  border: 1px solid var(--border2);
+  background: var(--bg3);
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-family: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.12s;
+}
+.badge-chip:hover { border-color: var(--orange); color: var(--text); }
+.badge-chip.on { border-color: var(--orange); background: var(--orange-dim); color: var(--orange); font-weight: 600; }
+
+.result-preview {
+  margin-top: 10px;
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius);
+  overflow: hidden;
+  display: none;
+}
+.result-preview img { width: 100%; display: block; }
+.result-placeholder {
+  padding: 32px 16px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
 /* ── RESPONSIVE ── */
 @media (max-width: 768px) {
   .layout { grid-template-columns: 1fr; }
@@ -347,7 +454,17 @@ input[type=color] { width: 26px; height: 26px; padding: 1px; border-radius: 4px;
   </div>
 </header>
 
-<div class="layout">
+<!-- TAB BAR -->
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="switchTab('banner')">🖼 Tạo Banner</button>
+  <button class="tab-btn" onclick="switchTab('product')">📷 Tạo ảnh sản phẩm</button>
+</div>
+
+<div id="layout">
+<!-- ══════════════════════════════════
+     TAB 1: TẠO BANNER
+══════════════════════════════════ -->
+<div class="tab-content active" id="tab-banner">
 
   <!-- ══ FORM ══ -->
   <div class="form-panel">
@@ -765,10 +882,10 @@ input[type=color] { width: 26px; height: 26px; padding: 1px; border-radius: 4px;
 
   </div><!-- /form-panel -->
 
-  <!-- ══ JSON PANEL ══ -->
+  <!-- ══ JSON PANEL — BANNER ══ -->
   <div class="json-panel">
     <div class="json-panel-head">
-      <h3>JSON Output</h3>
+      <h3>JSON Output — Banner</h3>
       <div style="display:flex;align-items:center;gap:6px">
         <div class="json-dot"></div>
         <span style="font-size:0.68rem;color:var(--muted)">Live</span>
@@ -779,20 +896,224 @@ input[type=color] { width: 26px; height: 26px; padding: 1px; border-radius: 4px;
     </div>
     <div class="json-panel-foot">
       <div class="status-msg" id="statusMsg"></div>
-      <button class="btn btn-copy" onclick="copyJSON()">
+      <button class="btn btn-copy" onclick="copyJSON('banner')">
         <span>📋</span> Copy JSON
       </button>
-      <button class="btn btn-send" id="sendBtn" onclick="sendToN8n()">
+      <button class="btn btn-send" id="sendBtn" onclick="sendToN8n('banner')">
         <span>⚡</span> Gửi đến n8n
       </button>
     </div>
   </div>
+
+</div><!-- /tab banner -->
+
+<!-- ══════════════════════════════════
+     TAB 2: TẠO ẢNH SẢN PHẨM
+══════════════════════════════════ -->
+<div class="tab-content" id="tab-product">
+
+  <!-- FORM PANEL -->
+  <div class="form-panel">
+    <h1>Tạo ảnh sản phẩm</h1>
+    <p class="desc">Upload ảnh thô → chọn xử lý → gửi n8n → nhận ảnh chuẩn thương mại điện tử</p>
+
+    <!-- 0. Upload ảnh gốc -->
+    <div class="section">
+      <div class="sec-title">0 · Ảnh sản phẩm gốc</div>
+      <div class="upload-zone" id="pUploadZone">
+        <input type="file" id="pFileInput" accept="image/*" multiple onchange="pHandleFiles(this)"/>
+        <div id="pUploadPlaceholder">
+          <div class="ico">📷</div>
+          <p><strong>Chọn ảnh</strong> hoặc kéo thả vào đây</p>
+          <p style="font-size:0.7rem;margin-top:2px">Hỗ trợ nhiều ảnh cùng lúc — JPG · PNG · WEBP</p>
+        </div>
+      </div>
+      <div class="batch-list" id="batchList"></div>
+      <div class="batch-count" id="batchCount"></div>
+    </div>
+
+    <!-- 1. Xử lý nền -->
+    <div class="section">
+      <div class="sec-title">1 · Xử lý nền</div>
+      <div class="mode-grid">
+        <div class="mode-card" onclick="pickMode(this,'transparent')">
+          <div class="mode-ico">🔲</div>
+          <div class="mode-name">Trong suốt</div>
+          <div class="mode-desc">PNG alpha, không nền</div>
+        </div>
+        <div class="mode-card on" onclick="pickMode(this,'white')">
+          <div class="mode-ico">⬜</div>
+          <div class="mode-name">Nền trắng</div>
+          <div class="mode-desc">Chuẩn Shopee/Lazada</div>
+        </div>
+        <div class="mode-card" onclick="pickMode(this,'ai')">
+          <div class="mode-ico">✨</div>
+          <div class="mode-name">Nền AI</div>
+          <div class="mode-desc">Generate bằng prompt</div>
+        </div>
+      </div>
+      <!-- AI prompt — chỉ hiện khi chọn mode AI -->
+      <div id="aiPromptWrap" style="display:none;margin-top:10px">
+        <div class="field">
+          <label>Background prompt (tiếng Anh)</label>
+          <div class="chips" id="pBgChips">
+            <button class="chip" onclick="pickPBg(this,'Pure white studio, soft professional light')">Trắng studio</button>
+            <button class="chip" onclick="pickPBg(this,'Dark tech background, orange rim light')">Dark tech</button>
+            <button class="chip" onclick="pickPBg(this,'Outdoor mountain, golden hour light')">Ngoài trời</button>
+            <button class="chip" onclick="pickPBg(this,'Cinematic dark, lens flare, bokeh')">Cinematic</button>
+            <button class="chip" onclick="pickPBg(this,'Wooden desk, natural window light')">Lifestyle</button>
+            <button class="chip" onclick="pickPBg(this,'Minimal grey gradient, professional')">Grey studio</button>
+          </div>
+          <div class="add-row">
+            <input type="text" id="pBgCustom" placeholder="Mô tả nền tự do..."/>
+            <button class="btn-add" onclick="pickPBgCustom()">+</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. Phong cách ảnh -->
+    <div class="section">
+      <div class="sec-title">2 · Phong cách ảnh</div>
+      <div class="chips" id="pStyleChips">
+        <button class="chip" onclick="pickP('pStyle',this,'Studio trắng chuyên nghiệp')">Studio trắng</button>
+        <button class="chip" onclick="pickP('pStyle',this,'Dark tech premium')">Dark tech</button>
+        <button class="chip" onclick="pickP('pStyle',this,'Lifestyle tự nhiên')">Lifestyle</button>
+        <button class="chip" onclick="pickP('pStyle',this,'Outdoor adventure')">Outdoor</button>
+        <button class="chip" onclick="pickP('pStyle',this,'Cinematic dramatic')">Cinematic</button>
+        <button class="chip" onclick="pickP('pStyle',this,'Minimalist clean')">Minimalist</button>
+        <button class="chip" onclick="pickP('pStyle',this,'Luxury premium')">Luxury</button>
+      </div>
+      <div class="add-row">
+        <input type="text" id="pStyleCustom" placeholder="Phong cách khác..."/>
+        <button class="btn-add" onclick="pickPCustom('pStyle','pStyleCustom','pStyleChips')">+</button>
+      </div>
+    </div>
+
+    <!-- 3. Kích thước & Định dạng -->
+    <div class="section">
+      <div class="sec-title">3 · Kích thước & Định dạng</div>
+      <div class="field">
+        <label>Kích thước output</label>
+        <div class="chips" id="pSizeChips">
+          <button class="chip" onclick="pickP('pSize',this,'800x800')">🛒 800×800 (Shopee)</button>
+          <button class="chip" onclick="pickP('pSize',this,'1000x1000')">📦 1000×1000</button>
+          <button class="chip" onclick="pickP('pSize',this,'1200x1200')">🖼 1200×1200</button>
+          <button class="chip" onclick="pickP('pSize',this,'2000x2000')">🔍 2000×2000 (HD)</button>
+          <button class="chip" onclick="pickP('pSize',this,'1080x1350')">📱 1080×1350 (IG)</button>
+          <button class="chip" onclick="pickP('pSize',this,'1920x1080')">🖥 1920×1080 (16:9)</button>
+        </div>
+        <div class="add-row">
+          <input type="text" id="pSizeCustom" placeholder="Kích thước khác VD: 1500x1500"/>
+          <button class="btn-add" onclick="pickPCustom('pSize','pSizeCustom','pSizeChips')">+</button>
+        </div>
+      </div>
+      <div class="field">
+        <label>Định dạng file</label>
+        <div class="chips" id="pFormatChips">
+          <button class="chip on" onclick="pickP('pFormat',this,'jpg')">JPG</button>
+          <button class="chip" onclick="pickP('pFormat',this,'png')">PNG</button>
+          <button class="chip" onclick="pickP('pFormat',this,'webp')">WEBP</button>
+        </div>
+      </div>
+      <div class="field">
+        <label>Chất lượng</label>
+        <div class="chips" id="pQualityChips">
+          <button class="chip" onclick="pickP('pQuality',this,'draft')">Draft (nhanh)</button>
+          <button class="chip on" onclick="pickP('pQuality',this,'standard')">Standard</button>
+          <button class="chip" onclick="pickP('pQuality',this,'hd')">HD (tốt nhất)</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. Processor -->
+    <div class="section">
+      <div class="sec-title">4 · API xử lý ảnh</div>
+      <div class="chips" id="pProcessorChips">
+        <button class="chip on" onclick="pickP('pProcessor',this,'photoroom')">PhotoRoom (khuyến nghị)</button>
+        <button class="chip" onclick="pickP('pProcessor',this,'removebg')">Remove.bg (fallback)</button>
+      </div>
+    </div>
+
+    <!-- 5. Badge & Watermark -->
+    <div class="section">
+      <div class="sec-title">5 · Badge & Watermark</div>
+      <div class="field">
+        <label>Badge thêm vào ảnh</label>
+        <div class="badge-grid" id="badgeChips">
+          <button class="badge-chip" onclick="toggleBadge(this,'Chính hãng')">✓ Chính hãng</button>
+          <button class="badge-chip" onclick="toggleBadge(this,'Mới về')">🆕 Mới về</button>
+          <button class="badge-chip" onclick="toggleBadge(this,'Best Seller')">🔥 Best Seller</button>
+          <button class="badge-chip" onclick="toggleBadge(this,'Sale')">🏷 Sale</button>
+          <button class="badge-chip" onclick="toggleBadge(this,'Free ship')">🚚 Free ship</button>
+          <button class="badge-chip" onclick="toggleBadge(this,'Trả góp 0%')">💳 Trả góp 0%</button>
+        </div>
+        <div class="add-row">
+          <input type="text" id="badgeCustom" placeholder="Badge tùy chỉnh..."/>
+          <button class="btn-add" onclick="addBadgeCustom()">+</button>
+        </div>
+      </div>
+      <div class="field">
+        <label>Vị trí watermark logo</label>
+        <div class="chips" id="wmChips">
+          <button class="chip" onclick="pickP('watermark',this,'none')">Không có</button>
+          <button class="chip" onclick="pickP('watermark',this,'top-left')">Góc trên trái</button>
+          <button class="chip" onclick="pickP('watermark',this,'top-right')">Góc trên phải</button>
+          <button class="chip" onclick="pickP('watermark',this,'bottom-left')">Góc dưới trái</button>
+          <button class="chip" onclick="pickP('watermark',this,'bottom-right')">Góc dưới phải</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. Ghi chú -->
+    <div class="section">
+      <div class="sec-title">6 · Ghi chú thêm</div>
+      <textarea id="pNotes" rows="3" placeholder="VD: Giữ màu sắc sản phẩm trung thực, không làm sáng quá, đảm bảo viền sắc nét..." oninput="pBuild()"></textarea>
+    </div>
+
+  </div><!-- /form-panel product -->
+
+  <!-- ══ JSON PANEL — PRODUCT ══ -->
+  <div class="json-panel">
+    <div class="json-panel-head">
+      <h3>JSON Output — Ảnh SP</h3>
+      <div style="display:flex;align-items:center;gap:6px">
+        <div class="json-dot"></div>
+        <span style="font-size:0.68rem;color:var(--muted)">Live</span>
+      </div>
+    </div>
+    <div class="json-body">
+      <pre class="json-out" id="pJsonOut">{}</pre>
+    </div>
+    <div class="json-panel-foot">
+      <div class="status-msg" id="pStatusMsg"></div>
+      <button class="btn btn-copy" onclick="copyJSON('product')">
+        <span>📋</span> Copy JSON
+      </button>
+      <button class="btn btn-send" id="pSendBtn" onclick="sendToN8n('product')">
+        <span>⚡</span> Gửi đến n8n
+      </button>
+    </div>
+  </div>
+
+</div><!-- /tab product -->
 
 </div><!-- /layout -->
 
 <div class="toast" id="toast"></div>
 
 <script>
+
+// ══ TAB SWITCHING ══
+function switchTab(tab) {
+  document.querySelectorAll('.tab-btn').forEach((b,i) => b.classList.toggle('active', ['banner','product'][i] === tab));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+}
+
+// ══════════════════════════════
+// BANNER TAB STATE & LOGIC
+// ══════════════════════════════
 const S = {
   productName:'', category:'', brand:'', price:'', discount:'',
   features:[], campaign:'', headline:'', subHeadline:'', cta:'',
@@ -942,31 +1263,47 @@ function renderJSON(obj) {
 }
 
 // ── Actions ──
-function copyJSON() {
-  const obj = {...(window._currentJSON || {})};
-  if (S.imageBase64) obj.imageBase64 = S.imageBase64;
+function copyJSON(tab) {
+  tab = tab || 'banner';
+  let obj;
+  if (tab === 'product') {
+    obj = {...(window._currentProductJSON || {})};
+    if (P.images && P.images.length) obj.imagesBase64 = P.images.map(i => i.base64);
+  } else {
+    obj = {...(window._currentJSON || {})};
+    if (S.imageBase64) obj.imageBase64 = S.imageBase64;
+  }
   navigator.clipboard.writeText(JSON.stringify(obj, null, 2));
   toast('✅ Đã copy JSON!');
 }
 
-async function sendToN8n() {
+async function sendToN8n(tab) {
+  tab = tab || 'banner';
   const url = document.getElementById('webhookUrl').value.trim();
-  if (!url) {
-    setStatus('info', '⚠️ Nhập n8n Webhook URL ở thanh trên trước!');
-    return;
-  }
-  if (!S.productName) {
-    setStatus('err', '⚠️ Vui lòng nhập tên sản phẩm!');
-    return;
-  }
+  if (!url) { setStatus('info', '⚠️ Nhập n8n Webhook URL ở thanh trên trước!', tab); return; }
 
-  const btn = document.getElementById('sendBtn');
-  btn.disabled = true; btn.classList.add('loading');
+  const isProduct = tab === 'product';
+  const btnId = isProduct ? 'pSendBtn' : 'sendBtn';
+  const btn = document.getElementById(btnId);
+
+  if (!isProduct && !S.productName) { setStatus('err', '⚠️ Vui lòng nhập tên sản phẩm!', tab); return; }
+  if (isProduct && P.images.length === 0) { setStatus('err', '⚠️ Vui lòng upload ít nhất 1 ảnh!', tab); return; }
+
+  btn.disabled = true;
   btn.innerHTML = '<span>⏳</span> Đang gửi...';
-  setStatus('info', 'Đang kết nối đến n8n...');
+  setStatus('info', 'Đang kết nối đến n8n...', tab);
 
-  const payload = {...(window._currentJSON || {})};
-  if (S.imageBase64) payload.imageBase64 = S.imageBase64;
+  let payload;
+  if (isProduct) {
+    payload = {...(window._currentProductJSON || {})};
+    if (P.images.length) payload.imagesBase64 = P.images.map(i => i.base64);
+  } else {
+    payload = {...(window._currentJSON || {})};
+    if (S.imageBase64) payload.imageBase64 = S.imageBase64;
+  }
+
+  // Append tab type so n8n can route
+  payload._tab = tab;
 
   try {
     const res = await fetch(url, {
@@ -975,21 +1312,22 @@ async function sendToN8n() {
       body: JSON.stringify(payload)
     });
     if (res.ok) {
-      setStatus('ok', '✅ Gửi thành công! n8n đã nhận dữ liệu.');
+      setStatus('ok', '✅ Gửi thành công! n8n đã nhận dữ liệu.', tab);
       toast('✅ Đã gửi đến n8n!');
     } else {
-      setStatus('err', `❌ Lỗi ${res.status}: ${res.statusText}`);
+      setStatus('err', `❌ Lỗi ${res.status}: ${res.statusText}`, tab);
     }
   } catch (err) {
-    setStatus('err', '❌ Không kết nối được. Kiểm tra URL hoặc CORS.');
+    setStatus('err', '❌ Không kết nối được. Kiểm tra URL hoặc CORS.', tab);
   } finally {
-    btn.disabled = false; btn.classList.remove('loading');
+    btn.disabled = false;
     btn.innerHTML = '<span>⚡</span> Gửi đến n8n';
   }
 }
 
-function setStatus(type, msg) {
-  const el = document.getElementById('statusMsg');
+function setStatus(type, msg, tab) {
+  const id = (tab === 'product') ? 'pStatusMsg' : 'statusMsg';
+  const el = document.getElementById(id);
   el.className = 'status-msg ' + type;
   el.textContent = msg;
 }
@@ -1000,6 +1338,167 @@ function toast(msg) {
   setTimeout(() => t.classList.remove('show'), 2500);
 }
 
+// ══════════════════════════════
+// PRODUCT TAB STATE & LOGIC
+// ══════════════════════════════
+const P = {
+  images: [],          // [{name, size, base64}]
+  mode: 'white',
+  bgPrompt: '',
+  pStyle: '',
+  pSize: '',
+  pFormat: 'jpg',
+  pQuality: 'standard',
+  pProcessor: 'photoroom',
+  badges: [],
+  watermark: '',
+  notes: ''
+};
+
+// File upload — batch
+function pHandleFiles(input) {
+  const files = Array.from(input.files);
+  files.forEach(file => {
+    if (file.size > 20*1024*1024) { toast('⚠️ ' + file.name + ' quá 20MB, bỏ qua!'); return; }
+    if (P.images.find(i => i.name === file.name)) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      P.images.push({ name: file.name, size: file.size, base64: e.target.result });
+      renderBatchList();
+      pBuild();
+    };
+    reader.readAsDataURL(file);
+  });
+  document.getElementById('pUploadPlaceholder').style.display = P.images.length ? 'none' : 'block';
+}
+
+function renderBatchList() {
+  const list = document.getElementById('batchList');
+  const count = document.getElementById('batchCount');
+  list.innerHTML = '';
+  P.images.forEach((img, idx) => {
+    const div = document.createElement('div'); div.className = 'batch-item';
+    div.innerHTML = `
+      <img class="bi-thumb" src="${img.base64}" alt=""/>
+      <span class="bi-name">${img.name}</span>
+      <span class="bi-size">${(img.size/1024).toFixed(0)}KB</span>
+      <button class="bi-remove" onclick="removeBatchItem(${idx})">×</button>`;
+    list.appendChild(div);
+  });
+  count.textContent = P.images.length > 0 ? `${P.images.length} ảnh đã chọn` : '';
+  document.getElementById('pUploadPlaceholder').style.display = P.images.length ? 'none' : 'block';
+}
+
+function removeBatchItem(idx) {
+  P.images.splice(idx, 1);
+  renderBatchList();
+  pBuild();
+}
+
+// Drag drop batch
+const puz = document.getElementById('pUploadZone');
+puz.addEventListener('dragover', e => { e.preventDefault(); puz.classList.add('drag'); });
+puz.addEventListener('dragleave', () => puz.classList.remove('drag'));
+puz.addEventListener('drop', e => {
+  e.preventDefault(); puz.classList.remove('drag');
+  const dt = new DataTransfer();
+  Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/')).forEach(f => dt.items.add(f));
+  if (dt.files.length) { document.getElementById('pFileInput').files = dt.files; pHandleFiles(document.getElementById('pFileInput')); }
+});
+
+// Mode
+function pickMode(el, val) {
+  document.querySelectorAll('.mode-card').forEach(c => c.classList.remove('on'));
+  el.classList.add('on');
+  P.mode = val;
+  document.getElementById('aiPromptWrap').style.display = val === 'ai' ? 'block' : 'none';
+  pBuild();
+}
+
+// Generic pick for product tab
+function pickP(key, el, val) {
+  el.closest('.chips').querySelectorAll('.chip').forEach(c => c.classList.remove('on'));
+  el.classList.add('on'); P[key] = val; pBuild();
+}
+function pickPCustom(key, inputId, chipsId) {
+  const inp = document.getElementById(inputId);
+  const val = inp.value.trim(); if (!val) return;
+  const grp = document.getElementById(chipsId);
+  grp.querySelectorAll('.chip').forEach(c => c.classList.remove('on'));
+  const btn = document.createElement('button');
+  btn.className = 'chip on'; btn.textContent = val;
+  btn.onclick = function() { pickP(key, this, val); };
+  grp.appendChild(btn); P[key] = val; inp.value = ''; pBuild();
+}
+
+// BG prompt chips
+function pickPBg(el, val) {
+  document.querySelectorAll('#pBgChips .chip').forEach(c => c.classList.remove('on'));
+  el.classList.add('on'); P.bgPrompt = val; pBuild();
+}
+function pickPBgCustom() {
+  const inp = document.getElementById('pBgCustom');
+  const val = inp.value.trim(); if (!val) return;
+  document.querySelectorAll('#pBgChips .chip').forEach(c => c.classList.remove('on'));
+  const grp = document.getElementById('pBgChips');
+  const btn = document.createElement('button');
+  btn.className = 'chip on'; btn.textContent = val;
+  btn.onclick = function() { pickPBg(this, val); };
+  grp.appendChild(btn); P.bgPrompt = val; inp.value = ''; pBuild();
+}
+
+// Badges
+function toggleBadge(el, val) {
+  el.classList.toggle('on');
+  if (el.classList.contains('on')) { if (!P.badges.includes(val)) P.badges.push(val); }
+  else P.badges = P.badges.filter(b => b !== val);
+  pBuild();
+}
+function addBadgeCustom() {
+  const inp = document.getElementById('badgeCustom');
+  const val = inp.value.trim(); if (!val) return;
+  const grp = document.getElementById('badgeChips');
+  const btn = document.createElement('button');
+  btn.className = 'badge-chip on'; btn.textContent = val;
+  btn.onclick = function() { toggleBadge(this, val); };
+  grp.appendChild(btn);
+  P.badges.push(val); inp.value = ''; pBuild();
+}
+
+// Build product JSON
+function pBuild() {
+  P.notes = document.getElementById('pNotes').value.trim();
+  const out = {
+    _type: 'product-image',
+    processor: P.pProcessor || 'photoroom',
+    mode: P.mode,
+  };
+  if (P.mode === 'ai' && P.bgPrompt) out.bgPrompt = P.bgPrompt;
+  if (P.pStyle)   out.style      = P.pStyle;
+  if (P.pSize)    out.outputSize = P.pSize;
+  out.format  = P.pFormat  || 'jpg';
+  out.quality = P.pQuality || 'standard';
+  if (P.badges.length) out.badges = P.badges;
+  if (P.watermark && P.watermark !== 'none') out.watermarkPosition = P.watermark;
+  if (P.notes)    out.notes      = P.notes;
+  out.imageCount = P.images.length;
+  if (P.images.length) out.fileNames = P.images.map(i => i.name);
+
+  renderProductJSON(out);
+  window._currentProductJSON = out;
+}
+
+function renderProductJSON(obj) {
+  const lines = JSON.stringify(obj, null, 2);
+  const highlighted = lines
+    .replace(/("[\w]+")\s*:/g, '<span class="json-key">$1</span>:')
+    .replace(/:\s*(".*?")/g, ': <span class="json-str">$1</span>')
+    .replace(/:\s*(\d+\.?\d*)/g, ': <span class="json-num">$1</span>')
+    .replace(/:\s*(true|false|null)/g, ': <span class="json-bool">$1</span>');
+  document.getElementById('pJsonOut').innerHTML = highlighted;
+}
+
+pBuild();
 build();
 </script>
 </body>
